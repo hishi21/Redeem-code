@@ -3,6 +3,7 @@ import re
 import httpx
 import asyncio
 import genshin
+import xml.etree.ElementTree as ET
 
 # Configurações via Variáveis de Ambiente (GitHub Secrets)
 LTUID = os.environ.get("HOYO_LTUID")
@@ -15,7 +16,6 @@ def enviar_telegram(mensagem):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram não configurado. Pulando notificação.")
         return
-    # URL do Telegram restaurada
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": mensagem, "parse_mode": "Markdown"}
     try:
@@ -24,33 +24,35 @@ def enviar_telegram(mensagem):
         print(f"Erro ao enviar Telegram: {e}")
 
 def buscar_codigos_reddit():
-    """Varre o JSON público do Reddit em busca de códigos válidos"""
-    print("Buscando códigos no Reddit...")
-    # URL do Reddit usando new.json para evitar rate limit
-    url = "https://www.reddit.com/r/Genshin_Impact/new.json?limit=50"
+    """Varre o feed RSS público do Reddit em busca de códigos válidos"""
+    print("Buscando códigos no Reddit via RSS...")
+    url = "https://www.reddit.com/r/Genshin_Impact/new.rss?limit=50"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     
     codigos_encontrados = set()
     try:
         response = httpx.get(url, headers=headers, follow_redirects=True)
-        # Verifica se o Reddit respondeu com código de sucesso antes de ler o JSON
         if response.status_code != 200:
             print(f"Reddit respondeu com status: {response.status_code}")
             return []
             
-        data = response.json()
-        
+        # Parsing do XML/Atom do Feed RSS
+        root = ET.fromstring(response.text)
+        ns = {'atom': 'http://www.w3.org/2005/Atom'}
         padrao_codigo = re.compile(r'\b[A-Z0-9]{10,15}\b')
 
-        for post in data['data']['children']:
-            title = post['data']['title']
-            selftext = post['data']['selftext']
-            flair = post['data'].get('link_flair_text', '') or ''
+        for entry in root.findall('atom:entry', ns):
+            title = entry.find('atom:title', ns)
+            content = entry.find('atom:content', ns)
+            
+            texto_title = title.text if title is not None and title.text else ""
+            texto_content = content.text if content is not None and content.text else ""
+            texto_completo = f"{texto_title} {texto_content}"
 
-            if 'code' in title.lower() or 'code' in flair.lower() or 'redeem' in title.lower():
-                matches = padrao_codigo.findall(f"{title} {selftext}")
+            if 'code' in texto_completo.lower() or 'redeem' in texto_completo.lower():
+                matches = padrao_codigo.findall(texto_completo)
                 for match in matches:
                     if not match.isalpha() or match.isupper():
                         codigos_encontrados.add(match)
@@ -87,7 +89,5 @@ async def rodar_resgate():
             print(f"Erro inesperado no resgate do código {codigo}: {e}")
 
 if __name__ == "__main__":
-    # Notificação de teste do Telegram
-    enviar_telegram("🤖 *Automação Ativa:* O script acordou e está varrendo o Reddit!")
-    
+    enviar_telegram("🤖 *Automação Ativa:* O script acordou e está varrendo o Reddit via RSS!")
     asyncio.run(rodar_resgate())
