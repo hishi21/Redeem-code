@@ -16,7 +16,7 @@ def enviar_telegram(mensagem):
         print("Telegram não configurado. Pulando notificação.")
         return
     # URL corrigida com api. e /bot
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    url = "https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": mensagem, "parse_mode": "Markdown"}
     try:
         httpx.post(url, json=payload, timeout=10)
