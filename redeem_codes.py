@@ -26,7 +26,7 @@ def enviar_telegram(mensagem):
 def buscar_codigos_reddit():
     """Varre o feed RSS público do Reddit em busca de códigos válidos"""
     print("Buscando códigos no Reddit via RSS...")
-    url = "https://www.reddit.com/r/Genshin_Impact/new.rss?limit=50"
+    url = "https://www.reddit.com/r/Genshin_Impact/search.rss?q=code&restrict_sr=1&sort=new"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
