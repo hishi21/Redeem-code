@@ -2,9 +2,7 @@ name: Genshin Impact Auto Redeem Codes
 
 on:
   schedule:
-    # Roda a cada 12 horas automaticamente (padrão UTC)
     - cron: '0 */12 * * *'
-  # Permite que você clique em "Run workflow" no painel do GitHub para testar manualmente quando quiser
   workflow_dispatch:
 
 jobs:
@@ -27,7 +25,6 @@ jobs:
 
     - name: Executar Script de Resgate
       env:
-        # Injeta seus Secrets protegidos como variáveis de ambiente no container
         HOYO_LTUID: ${{ secrets.HOYO_LTUID }}
         HOYO_LTOKEN: ${{ secrets.HOYO_LTOKEN }}
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
