@@ -85,4 +85,7 @@ async def rodar_resgate():
             print(f"Erro inesperado no resgate do código {codigo}: {e}")
 
 if __name__ == "__main__":
+    # Força uma mensagem de teste para validar o seu fluxo de conexão do Telegram
+    enviar_telegram("🤖 *Automação Ativa:* O script acordou e está varrendo o Reddit!")
+    
     asyncio.run(rodar_resgate())
