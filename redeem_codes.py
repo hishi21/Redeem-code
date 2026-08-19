@@ -25,7 +25,7 @@ def enviar_telegram(mensagem):
         print(f"Erro ao enviar Telegram: {e}")
 
 def buscar_codigos_reddit():
-    """Varre o feed RSS público do Reddit em busca de códigos válidos"""
+    """Varre o feed RSS de busca do Reddit"""
     print("Buscando códigos no Reddit via RSS...")
     url = "https://www.reddit.com/r/Genshin_Impact/search.rss?q=code&restrict_sr=1&sort=new"
     headers = {
@@ -39,7 +39,6 @@ def buscar_codigos_reddit():
             print(f"Reddit respondeu com status: {response.status_code}")
             return []
             
-        # Parsing do XML/Atom do Feed RSS
         root = ET.fromstring(response.text)
         ns = {'atom': 'http://www.w3.org/2005/Atom'}
         padrao_codigo = re.compile(r'\b[A-Z0-9]{10,15}\b')
@@ -55,7 +54,7 @@ def buscar_codigos_reddit():
             if 'code' in texto_completo.lower() or 'redeem' in texto_completo.lower():
                 matches = padrao_codigo.findall(texto_completo)
                 for match in matches:
-                    if not match.isalpha() or match.isupper():
+                    if not match.isalpha() ou match.isupper():
                         codigos_encontrados.add(match)
                         
     except Exception as e:
@@ -64,8 +63,8 @@ def buscar_codigos_reddit():
     return list(codigos_encontrados)
 
 async def rodar_resgate():
-    if not LTUID or not LTOKEN:
-        print("Erro: Cookies da HoYoLAB não encontrados nos Secrets.")
+    if not LTUID or not LTOKEN or not COOKIE_TOKEN:
+        print("Erro: Cookies da HoYoLAB (LTUID, LTOKEN ou COOKIE_TOKEN) não encontrados nos Secrets.")
         return
 
     codigos = buscar_codigos_reddit()
@@ -75,7 +74,12 @@ async def rodar_resgate():
 
     print(f"Códigos encontrados para teste: {codigos}")
     
-    client = genshin.Client({"ltuid": LTUID, "ltoken": LTOKEN})
+    # Cliente atualizado com o cookie_token obrigatório
+    client = genshin.Client({
+        "ltuid": LTUID, 
+        "ltoken": LTOKEN,
+        "cookie_token": COOKIE_TOKEN
+    })
     
     for codigo in codigos:
         try:
