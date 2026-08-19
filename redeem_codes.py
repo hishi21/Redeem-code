@@ -78,6 +78,7 @@ async def rodar_resgate():
     client = genshin.Client({
         "ltuid": LTUID, 
         "ltoken": LTOKEN,
+        "account_id": LTUID
         "cookie_token": COOKIE_TOKEN
     })
     
