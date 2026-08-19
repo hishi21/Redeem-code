@@ -27,7 +27,7 @@ def buscar_codigos_reddit():
     """Varre o JSON público do Reddit em busca de códigos válidos"""
     print("Buscando códigos no Reddit...")
     # Endpoint em JSON do subreddit oficial de Genshin
-    url = "https://www.reddit.com/r/Genshin_Impact/new.json?limit=10"
+    url = "https://www.reddit.com/r/Genshin_Impact/new.json?limit=50"
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GenshinCodeBot/1.0"}
     
     codigos_encontrados = set()
