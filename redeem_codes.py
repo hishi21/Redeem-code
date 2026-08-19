@@ -23,14 +23,22 @@ def enviar_telegram(mensagem):
         print(f"Erro ao enviar Telegram: {e}")
 
 def buscar_codigos_reddit():
-    """Varre o JSON público do Reddit em busca de códigos válidos das últimas 24h"""
+    """Varre o JSON público do Reddit em busca de códigos válidos"""
     print("Buscando códigos no Reddit...")
-    url = "https://www.reddit.com/r/Genshin_Impact/search.json?q=code&restrict_sr=1&sort=new&t=day"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GenshinCodeBot/1.0"}
+    # Usando o endpoint new.json diretamente para evitar rate limit de busca
+    url = "https://www.reddit.com/r/Genshin_Impact/new.json?limit=50"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
+    }
     
     codigos_encontrados = set()
     try:
         response = httpx.get(url, headers=headers, follow_redirects=True)
+        # Verifica se o Reddit respondeu com código de sucesso antes de ler o JSON
+        if response.status_code != 200:
+            print(f"Reddit respondeu com status: {response.status_code}")
+            return []
+            
         data = response.json()
         
         padrao_codigo = re.compile(r'\b[A-Z0-9]{10,15}\b')
