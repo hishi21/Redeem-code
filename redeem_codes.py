@@ -54,7 +54,7 @@ def buscar_codigos_reddit():
             if 'code' in texto_completo.lower() or 'redeem' in texto_completo.lower():
                 matches = padrao_codigo.findall(texto_completo)
                 for match in matches:
-                    if not match.isalpha() ou match.isupper():
+                    if not match.isalpha() or match.isupper():
                         codigos_encontrados.add(match)
                         
     except Exception as e:
