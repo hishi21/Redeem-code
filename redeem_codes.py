@@ -74,12 +74,12 @@ async def rodar_resgate():
 
     print(f"Códigos encontrados para teste: {codigos}")
     
-    # Cliente atualizado com o cookie_token obrigatório
+    # Dicionário com todas as vírgulas corretas
     client = genshin.Client({
-        "ltuid": LTUID, 
+        "ltuid": LTUID,
         "ltoken": LTOKEN,
+        "cookie_token": COOKIE_TOKEN,
         "account_id": LTUID
-        "cookie_token": COOKIE_TOKEN
     })
     
     for codigo in codigos:
