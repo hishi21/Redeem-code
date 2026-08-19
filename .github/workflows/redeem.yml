@@ -27,6 +27,7 @@ jobs:
       env:
         HOYO_LTUID: ${{ secrets.HOYO_LTUID }}
         HOYO_LTOKEN: ${{ secrets.HOYO_LTOKEN }}
+        HOYO_COOKIE_TOKEN: ${{ secrets.HOYO_COOKIE_TOKEN }}
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: python redeem_codes.py
