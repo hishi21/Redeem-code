@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 # Configurações via Variáveis de Ambiente (GitHub Secrets)
 LTUID = os.environ.get("HOYO_LTUID")
 LTOKEN = os.environ.get("HOYO_LTOKEN")
+COOKIE_TOKEN = os.environ.get("HOYO_COOKIE_TOKEN")
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
