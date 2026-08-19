@@ -15,7 +15,8 @@ def enviar_telegram(mensagem):
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram não configurado. Pulando notificação.")
         return
-    url = "https://www.reddit.com/r/Genshin_Impact/search.json?q=code&restrict_sr=1&sort=new&t=week"
+    # URL do Telegram restaurada
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": mensagem, "parse_mode": "Markdown"}
     try:
         httpx.post(url, json=payload, timeout=10)
@@ -25,7 +26,7 @@ def enviar_telegram(mensagem):
 def buscar_codigos_reddit():
     """Varre o JSON público do Reddit em busca de códigos válidos"""
     print("Buscando códigos no Reddit...")
-    # Usando o endpoint new.json diretamente para evitar rate limit de busca
+    # URL do Reddit usando new.json para evitar rate limit
     url = "https://www.reddit.com/r/Genshin_Impact/new.json?limit=50"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"
