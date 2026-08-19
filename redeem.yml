@@ -1,0 +1,35 @@
+name: Genshin Impact Auto Redeem Codes
+
+on:
+  schedule:
+    # Roda a cada 12 horas automaticamente (padrão UTC)
+    - cron: '0 */12 * * *'
+  # Permite que você clique em "Run workflow" no painel do GitHub para testar manualmente quando quiser
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código fonte
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python ambiente
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependências necessárias
+      run: |
+        python -m pip install --upgrade pip
+        pip install genshin httpx
+
+    - name: Executar Script de Resgate
+      env:
+        # Injeta seus Secrets protegidos como variáveis de ambiente no container
+        HOYO_LTUID: ${{ secrets.HOYO_LTUID }}
+        HOYO_LTOKEN: ${{ secrets.HOYO_LTOKEN }}
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python redeem_codes.py
