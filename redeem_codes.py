@@ -1,14 +1,9 @@
 import os
 import re
 import httpx
-import asyncio
-import genshin
 import xml.etree.ElementTree as ET
 
 # Configurações via Variáveis de Ambiente (GitHub Secrets)
-LTUID = os.environ.get("HOYO_LTUID")
-LTOKEN = os.environ.get("HOYO_LTOKEN")
-COOKIE_TOKEN = os.environ.get("HOYO_COOKIE_TOKEN")
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
@@ -25,7 +20,7 @@ def enviar_telegram(mensagem):
         print(f"Erro ao enviar Telegram: {e}")
 
 def buscar_codigos_reddit():
-    """Varre o feed RSS de busca do Reddit"""
+    """Varre o feed RSS de busca do Reddit em busca de códigos válidos"""
     print("Buscando códigos no Reddit via RSS...")
     url = "https://www.reddit.com/r/Genshin_Impact/search.rss?q=code&restrict_sr=1&sort=new"
     headers = {
@@ -62,38 +57,15 @@ def buscar_codigos_reddit():
     
     return list(codigos_encontrados)
 
-async def rodar_resgate():
-    if not LTUID or not LTOKEN or not COOKIE_TOKEN:
-        print("Erro: Cookies da HoYoLAB (LTUID, LTOKEN ou COOKIE_TOKEN) não encontrados nos Secrets.")
-        return
-
-    codigos = buscar_codigos_reddit()
-    if not codigos:
-        print("Nenhum código novo mapeado no Reddit nas últimas postagens.")
-        return
-
-    print(f"Códigos encontrados para teste: {codigos}")
-    
-    # Dicionário com todas as vírgulas corretas
-    client = genshin.Client({
-        "ltuid": LTUID,
-        "ltoken": LTOKEN,
-        "cookie_token": COOKIE_TOKEN,
-        "account_id": LTUID
-    })
-    
-    for codigo in codigos:
-        try:
-            print(f"Tentando resgatar: {codigo}")
-            await client.redeem_code(codigo, game=genshin.Game.GENSHIN)
-            msg = f"✅ *Genshin Impact Code*\nCódigo `{codigo}` resgatado com sucesso via automação!"
-            print(msg)
-            enviar_telegram(msg)
-        except genshin.errors.RedemptionException as e:
-            print(f"Resultado para {codigo}: {e.msg}")
-        except Exception as e:
-            print(f"Erro inesperado no resgate do código {codigo}: {e}")
-
 if __name__ == "__main__":
-    enviar_telegram("🤖 *Automação Ativa:* O script acordou e está varrendo o Reddit via RSS!")
-    asyncio.run(rodar_resgate())
+    print("Iniciando varredura de códigos do Genshin...")
+    codigos = buscar_codigos_reddit()
+    
+    if codigos:
+        # Formata a lista de códigos em bullet points para o Telegram
+        lista_formatada = "\n".join([f"• `{codigo}`" for codigo in codigos])
+        msg = f"🎁 *Novos Códigos do Genshin Encontrados!*\n\nAqui estão os códigos mapeados recentemente:\n\n{lista_formatada}"
+        print(f"Enviando {len(codigos)} códigos para o Telegram...")
+        enviar_telegram(msg)
+    else:
+        print("Nenhum código novo encontrado nesta execução.")
